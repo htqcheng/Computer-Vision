@@ -29,7 +29,7 @@ def matchPics(I1, I2, opts):
 
 	#Match features using the descriptors
 	matches = briefMatch(desc1, desc2, ratio)
-	print(matches)
+	# print(matches)
 
 	return matches, locs1, locs2
 
