@@ -17,24 +17,6 @@ def computeH(x1, x2):
 	return H2to1
 
 
-# def computeH(x1, x2):
-# 	# Q2.2.1
-# 	# Compute the homography between two sets of points
-#
-# 	assert (x1.shape[0] == x2.shape[0])
-# 	assert (x1.shape[1] == 2)
-#
-# 	A = []
-# 	for i in range(x1.shape[0]):
-# 		A.append(np.array([-x2[i, 0], -x2[i, 1], -1, 0, 0, 0, x1[i, 0] * x2[i, 0], x1[i, 0] * x2[i, 1], x1[i, 0]]))
-# 		A.append(np.array([0, 0, 0, -x2[i, 0], -x2[i, 1], -1, x1[i, 1] * x2[i, 0], x1[i, 1] * x2[i, 1], x1[i, 1]]))
-#
-# 	U, S, V = np.linalg.svd(np.asarray(A))
-# 	H2to1 = V[-1, :].reshape(3, 3) / V[-1, -1]
-#
-# 	return H2to1
-
-
 def computeH_norm(x1, x2):
 	#Q2.2.2
 	#Compute the centroid of the points
@@ -117,7 +99,7 @@ def computeH_ransac(locs1, locs2, opts):
 		diff = locs1 - non_homogeneous
 		normalized = np.sqrt(np.sum(diff**2, axis=1))
 		inlier = normalized <= inlier_tol
-		# for loop method
+		## for loop method
 		# for p in range(N):
 		# 	locs2_p = np.concatenate((locs2[p], [1]))
 		# 	projected = H2to1 @ locs2_p

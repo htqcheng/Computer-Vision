@@ -21,9 +21,14 @@ for i in range(36):
     #Update histogram
     histogram[i] = matches.shape[0]
     angles[i] = 10*i
+    if i == 1 or i == 9 or i == 18:
+        plotMatches(cv_cover, rotated, matches, locs1, locs2)
     print(histogram)
     print(i)
 
 #Display histogram
-plt.bar(angles, histogram)
+plt.bar(angles, histogram, width=10, align='center')
+plt.xlabel('Rotation Angle')
+plt.ylabel('Number of Matches')
+plt.title('BRIEF and Rotation')
 plt.show()
