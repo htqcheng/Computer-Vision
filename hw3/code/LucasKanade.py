@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import ndimage
 from scipy.interpolate import RectBivariateSpline
 
 def LucasKanade(It, It1, rect, threshold, num_iters, p0=np.zeros(2)):
@@ -12,7 +13,59 @@ def LucasKanade(It, It1, rect, threshold, num_iters, p0=np.zeros(2)):
     :return: p: movement vector [dp_x, dp_y]
     """
 	
-    # Put your implementation here
+    # Initialize warp matrix p
     p = p0
-    
+    # Assume input images don't need to be processed (RGB2Grey or similar)
+    # note numr is y and numc is x for cartesian
+    points = []
+    numr = int(rect[3]-rect[1]+1)
+    numc = int(rect[2]-rect[0]+1)
+    # number of points
+    N = numr*numc
+    for i in range(numc):
+        for j in range(numr):
+            points.append([int(rect[0]//1+i), int(rect[1]//1+j)])
+    # points become a 2 by N matrix, note it is x, y
+    points = np.asarray(points).T
+    # append 1s to the bottom
+    # points = np.vstack(points, np.ones((points.shape[1], 1)))
+    # should be 2xN
+    # print("The shape of points should be 2xN: " + str(points.shape))
+    # get original intensities, shift image to estimate partial rect positions
+    x_shift = rect[0]%1
+    y_shift = rect[1]%1
+    shifted_It = ndimage.shift(It, [-y_shift, -x_shift])
+    T_x = shifted_It[points[1, :], points[0, :]]
+    # T_x = RectBivariateSpline([rect[0], rect[2]], [rect[1], rect[3]], It)
+    # print("The shape of T(x) is : " + str(T_x.shape))
+
+    #iterate over to find true p
+    for i in range(int(num_iters)):
+        # account for fractional location after warp
+        shifted_It1 = ndimage.shift(It1, [-p[1], -p[0]])
+        # get warped image 1D vector
+        It1_patch = shifted_It1[points[1, :], points[0, :]]
+        # computer error b (1xN)
+        b = T_x - It1_patch
+        b = b.reshape((N, 1))
+        # print("The shape of b is: " + str(b.shape))
+        # reshape and compute gradients. Not sure if sobel axis is correct
+        # maybe np.gradient
+        image_grad_y = np.gradient(shifted_It1, axis=0)
+        image_grad_x = np.gradient(shifted_It1, axis=1)
+        # image_grad_y = ndimage.sobel(shifted_It1, axis=0) 
+        # image_grad_x = ndimage.sobel(shifted_It1, axis=1)
+        A_T = np.zeros((2, N))
+        A_T[0, :] = image_grad_x[points[1, :], points[0, :]]
+        A_T[1, :] = image_grad_y[points[1, :], points[0, :]]
+        hessian = A_T @ A_T.T
+        # print("The shape of hessian is: " + str(hessian.shape))
+        delta_p = np.linalg.inv(hessian) @ A_T @ b
+        # print(np.linalg.norm(delta_p))
+        p[0] += delta_p[0]
+        p[1] += delta_p[1]
+        print(p)
+        if np.linalg.norm(delta_p) < threshold:
+            break
+
     return p
