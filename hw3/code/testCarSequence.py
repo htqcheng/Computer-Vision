@@ -21,16 +21,16 @@ for i in range(cuts-1):
     It = seq[:, :, i]
     It1 = seq[:, :, i+1]
     p = LucasKanade(It, It1, rect, threshold, num_iters)
-    # if i == 0 or i==99 or i==199 or i==299 or i==399:
-    # if i > 30:
-    print(i)
-    fig, img = plt.subplots(1)
-    img.imshow(It, cmap='gray')
-    width = rect[2]-rect[0]
-    height = rect[3]-rect[1]
-    box = patches.Rectangle((rect[0], rect[1]), width, height, linewidth=1, edgecolor='r', facecolor='none')
-    img.add_patch(box)
-    plt.show()
+    if i == 0 or i==99 or i==199 or i==299 or i==399:
+        # if i > 30:
+        print(i)
+        fig, img = plt.subplots(1)
+        img.imshow(It, cmap='gray')
+        width = rect[2]-rect[0]
+        height = rect[3]-rect[1]
+        box = patches.Rectangle((rect[0], rect[1]), width, height, linewidth=1, edgecolor='r', facecolor='none')
+        img.add_patch(box)
+        plt.show()
     rect[0] += p[0]
     rect[2] += p[0]
     rect[1] += p[1]
