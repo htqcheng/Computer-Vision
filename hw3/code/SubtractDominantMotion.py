@@ -1,4 +1,6 @@
 import numpy as np
+from scipy import ndimage
+from LucasKanadeAffine import LucasKanadeAffine
 
 def SubtractDominantMotion(image1, image2, threshold, num_iters, tolerance):
     """
@@ -10,7 +12,11 @@ def SubtractDominantMotion(image1, image2, threshold, num_iters, tolerance):
     :return: mask: [nxm]
     """
     
-    # put your implementation here
+    # edges where image1 and 2 don't both show image could be a problem
     mask = np.ones(image1.shape, dtype=bool)
+    M = LucasKanadeAffine(image1, image2, threshold, num_iters)
+    image1_affine = ndimage.affine_transform(image1, M)
+    diff = image2 - image1_affine
+    mask = diff>tolerance
 
     return mask

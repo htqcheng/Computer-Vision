@@ -12,7 +12,7 @@ def LucasKanadeAffine(It, It1, threshold, num_iters):
     """
 
     # put your implementation here
-    M = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    M = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
 
     T_x = It[20:-20, 20:-20]  # cut out parts of the image so all is contained in It1
     # xs = np.arange(rect[0], rect[2] + 1, 1)
@@ -28,6 +28,7 @@ def LucasKanadeAffine(It, It1, threshold, num_iters):
     # iterate over to find true p
     for i in range(int(num_iters)):
         # account for fractional location after warp
+        # Not sure if inverse M is correct here
         shifted_It1 = ndimage.affine_transform(It1, np.linalg.inv(M))
         # get warped image 1D vector
         It1_patch = shifted_It1[20:-20, 20:-20]
@@ -39,14 +40,13 @@ def LucasKanadeAffine(It, It1, threshold, num_iters):
         # maybe np.gradient
         image_grad_y = np.gradient(shifted_It1, axis=0)
         image_grad_x = np.gradient(shifted_It1, axis=1)
-        # image_grad_y = ndimage.sobel(shifted_It1, axis=0)
-        # image_grad_x = ndimage.sobel(shifted_It1, axis=1)
-        grad_x_patch = image_grad_x[20:-20, 20:-20].reshape((N, 1))
-        grad_y_patch = image_grad_y[20:-20, 20:-20].reshape((N, 1))
+        grad_x_patch = image_grad_x[20:-20, 20:-20].reshape(-1)
+        grad_y_patch = image_grad_y[20:-20, 20:-20].reshape(-1)
         grad_I = np.zeros((N, 2))
         grad_I[:, 0] = grad_x_patch
         grad_I[:, 1] = grad_y_patch
         A = np.zeros((N, 6))
+        # Assume the x's get reshaped to a row first
         for c in range(N):
             y = 20 + c//x_len
             x = 20 + c % x_len
@@ -56,12 +56,12 @@ def LucasKanadeAffine(It, It1, threshold, num_iters):
         # print("The shape of hessian is: " + str(hessian.shape))
         delta_p = np.linalg.inv(hessian) @ A.T @ b
 
-        print(delta_p.shape)
-        M += delta_p.reshape((2, 3))
+        # print("The shape of delta_p is: " + str(delta_p.shape))
+        M[0:2, :] += delta_p.reshape((2, 3))
         # print(np.linalg.norm(delta_p))
 
-        # print(p)
+        print(np.linalg.norm(delta_p))
         if np.linalg.norm(delta_p) < threshold:
             break
-
+    M = M[0:2, :]
     return M
