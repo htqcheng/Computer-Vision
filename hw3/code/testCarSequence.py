@@ -16,23 +16,32 @@ threshold = args.threshold
 seq = np.load("../../../CV_Large_data/hw3/data/carseq.npy")
 rect = [59, 116, 145, 151]
 cuts = seq.shape[2]
+carseqrects = []
+carseqrects.append(rect)
+fig, img = plt.subplots(1)
+
 for i in range(cuts-1):
     print(i)
     It = seq[:, :, i]
     It1 = seq[:, :, i+1]
     p = LucasKanade(It, It1, rect, threshold, num_iters)
-    if i == 0 or i==99 or i==199 or i==299 or i==399:
+    # if i == 0 or i==99 or i==199 or i==299 or i==399:
         # if i > 30:
-        print(i)
-        fig, img = plt.subplots(1)
-        img.imshow(It, cmap='gray')
-        width = rect[2]-rect[0]
-        height = rect[3]-rect[1]
-        box = patches.Rectangle((rect[0], rect[1]), width, height, linewidth=1, edgecolor='r', facecolor='none')
-        img.add_patch(box)
-        plt.show()
+    img.imshow(It, cmap='gray')
+    width = rect[2]-rect[0]
+    height = rect[3]-rect[1]
+    box = patches.Rectangle((rect[0], rect[1]), width, height, linewidth=1, edgecolor='r', facecolor='none')
+    img.add_patch(box)
+    plt.show(block=False)
+    plt.pause(0.01)
+    img.clear()
+
     rect[0] += p[0]
     rect[2] += p[0]
     rect[1] += p[1]
     rect[3] += p[1]
+    carseqrects.append(rect)
     # plt.show()
+carseqrects = np.asarray(carseqrects)
+print(carseqrects.shape)
+np.save("carseqrects", carseqrects)
