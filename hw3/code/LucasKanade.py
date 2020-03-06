@@ -67,8 +67,11 @@ def LucasKanade(It, It1, rect, threshold, num_iters, p0=np.zeros(2)):
         grad_x_patch = Rect_x(ys, xs)
         grad_y_patch = Rect_y(ys, xs)
         A_T = np.zeros((2, N))
-        A_T[0, :] = grad_x_patch.reshape(-1)
-        A_T[1, :] = grad_y_patch.reshape(-1)
+        # A_T[0, :] = grad_x_patch.reshape(-1)
+        # A_T[1, :] = grad_y_patch.reshape(-1)
+        # ravel is faster
+        A_T[0, :] = grad_x_patch.ravel()
+        A_T[1, :] = grad_y_patch.ravel()
         hessian = A_T @ A_T.T
         # print("The shape of hessian is: " + str(hessian.shape))
         delta_p = np.linalg.inv(hessian) @ A_T @ b

@@ -13,10 +13,15 @@ def SubtractDominantMotion(image1, image2, threshold, num_iters, tolerance):
     """
     
     # edges where image1 and 2 don't both show image could be a problem
-    mask = np.ones(image1.shape, dtype=bool)
+    # mask = np.ones(image1.shape, dtype=bool)
     M = LucasKanadeAffine(image1, image2, threshold, num_iters)
-    image1_affine = ndimage.affine_transform(image1, M)
-    diff = image2 - image1_affine
-    mask = diff>tolerance
+    image2_affine = ndimage.affine_transform(image2, M)
+    image1_mask = np.ones(image1.shape)
+    image1_mask = ndimage.affine_transform(image1_mask, M)
+    diff = image1*image1_mask - image2_affine
+    mask = abs(diff) > tolerance
+    # mask = ndimage.morphology.binary_erosion(mask, iterations=1)
+    mask = ndimage.morphology.binary_dilation(mask, iterations=10)
+    mask = ndimage.morphology.binary_erosion(mask, iterations=10)
 
     return mask

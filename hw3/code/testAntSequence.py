@@ -9,7 +9,7 @@ from SubtractDominantMotion import SubtractDominantMotion
 parser = argparse.ArgumentParser()
 parser.add_argument('--num_iters', type=int, default=1e3, help='number of iterations of Lucas-Kanade')
 parser.add_argument('--threshold', type=float, default=1e-2, help='dp threshold of Lucas-Kanade for terminating optimization')
-parser.add_argument('--tolerance', type=float, default=0.2, help='binary threshold of intensity difference when computing the mask')
+parser.add_argument('--tolerance', type=float, default=0.05, help='binary threshold of intensity difference when computing the mask')
 args = parser.parse_args()
 num_iters = args.num_iters
 threshold = args.threshold
@@ -28,8 +28,8 @@ for i in range(cuts-1):
     # if i == 0 or i==99 or i==199 or i==299 or i==399:
         # if i > 30:
     img.imshow(It, cmap='gray')
-    # box = patches.Rectangle((rect[0], rect[1]), width, height, linewidth=1, edgecolor='r', facecolor='none')
-    img.add_patch(mask)
+    mask2 = np.ma.masked_where(1-mask, np.ones(mask.shape))
+    img.imshow(mask2, cmap='hsv')
     plt.show(block=False)
     plt.pause(0.01)
     img.clear()
