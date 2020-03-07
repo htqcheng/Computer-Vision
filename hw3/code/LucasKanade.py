@@ -15,27 +15,6 @@ def LucasKanade(It, It1, rect, threshold, num_iters, p0=np.zeros(2)):
 	
     # Initialize warp matrix p
     p = p0
-    # Assume input images don't need to be processed (RGB2Grey or similar)
-    # note numr is y and numc is x for cartesian
-    # points = []
-    # numr = int(rect[3]-rect[1]+1)
-    # numc = int(rect[2]-rect[0]+1)
-    # number of points
-    # N = numr*numc
-    # for i in range(numc):
-    #     for j in range(numr):
-    #         points.append([int(rect[0]+i), int(rect[1]+j)])
-    # # points become a 2 by N matrix, note it is x, y
-    # points = np.asarray(points).T
-    # append 1s to the bottom
-    # points = np.vstack(points, np.ones((points.shape[1], 1)))
-    # should be 2xN
-    # print("The shape of points should be 2xN: " + str(points.shape))
-    # get original intensities, shift image to estimate partial rect positions
-    # x_shift = rect[0]%1
-    # y_shift = rect[1]%1
-    # shifted_It = ndimage.shift(It, [-y_shift, -x_shift])
-    # T_x = shifted_It[points[1, :], points[0, :]]
     xs = np.arange(rect[0], rect[2]+1, 1)
     ys = np.arange(rect[1], rect[3]+1, 1)
     It_x = np.arange(0, It.shape[1], 1)
