@@ -4,7 +4,8 @@ Replace 'pass' by your implementation.
 """
 
 # Insert your package here
-
+import numpy as np
+import helper
 
 '''
 Q2.1: Eight Point Algorithm
@@ -15,7 +16,37 @@ Q2.1: Eight Point Algorithm
 '''
 def eightpoint(pts1, pts2, M):
     # Replace pass by your implementation
-    pass
+    T = np.array([[2/M, 0, -1], [0, 2/M, -1], [0, 0, 1]])
+    N = pts1.shape[0]
+    pts1_h = np.hstack((pts1, np.ones((N,1)))).T
+    pts2_h = np.hstack((pts2, np.ones((N,1)))).T
+    pts1_norm = (T@pts1_h).T
+    pts2_norm = (T@pts2_h).T
+
+    # Build the matrix U
+    U = np.zeros((N,9))
+    U[:,0] = pts1_norm[:,0]*pts2_norm[:,0]
+    U[:,1] = pts1_norm[:,0]*pts2_norm[:,1]
+    U[:,2] = pts1_norm[:,0]
+    U[:,3] = pts1_norm[:,1]*pts2_norm[:,0]
+    U[:,4] = pts1_norm[:,1]*pts2_norm[:,1]
+    U[:,5] = pts1_norm[:,1]
+    U[:,6] = pts2_norm[:,0]
+    U[:,7] = pts2_norm[:,1]
+    U[:,8] = np.ones((N))
+    # Compute F
+    eig_values, eig_vectors = np.linalg.eig((U.T)@U)
+    min_vec = eig_vectors[:, np.argmin(eig_values)]
+    F = min_vec.reshape((3, 3))
+    # Enforce singularity condition
+    w, diag, vt = np.linalg.svd(F)
+    diag[2] = 0
+    F_sing = w@np.diagflat(diag)@vt
+    # F_sing = refineF(F_sing, pts1, pts2)
+    # unnormalize F
+    F_unnorm = T.T@F_sing@T
+
+    return F_unnorm
 
 
 '''
@@ -27,7 +58,8 @@ Q3.1: Compute the essential matrix E.
 '''
 def essentialMatrix(F, K1, K2):
     # Replace pass by your implementation
-    pass
+    E = K1.T@F@K2
+    return E
 
 
 '''
@@ -41,7 +73,14 @@ Q3.2: Triangulate a set of 2D coordinates in the image to a set of 3D points.
 '''
 def triangulate(C1, pts1, C2, pts2):
     # Replace pass by your implementation
-    pass
+    N = pts1.shape[0]
+    for i in range(N):
+        A = np.zeros((4,4))
+        A[0, :] = C1[0,:] - (C1[2,:]*pts1[i,0])
+        A[1, :] = C1[1,:] - (C1[2,:]*pts1[i,1])
+        A[2, :] = C2[0,:] - (C2[2,:]*pts2[i,0])
+        A[3, :] = C2[1,:] - (C2[2,:]*pts2[i,1])
+
 
 
 '''

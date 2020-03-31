@@ -17,6 +17,7 @@ color_links = [(255,0,0),(255,0,0),(255,0,0),(255,0,0),(0,0,255),(255,0,255),(0,
 colors = ['blue','blue','blue','blue','red','magenta','green','green','green','green','red','red','red','red','magenta','magenta','magenta','magenta']
 
 
+
 def visualize_keypoints(image, pts, Threshold=None):
     '''
     plot 2d keypoint
