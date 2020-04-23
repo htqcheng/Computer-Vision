@@ -14,6 +14,9 @@ def initialize_weights(in_size,out_size,params,name=''):
     ##########################
     ##### your code here #####
     ##########################
+    xavier = np.sqrt(6)/np.sqrt(in_size+out_size)
+    W = np.random.uniform(-xavier, xavier, (in_size, out_size))
+    b = np.zeros(out_size)
 
     params['W' + name] = W
     params['b' + name] = b
@@ -22,11 +25,8 @@ def initialize_weights(in_size,out_size,params,name=''):
 # x is a matrix
 # a sigmoid activation function
 def sigmoid(x):
-    res = None
-
-    ##########################
-    ##### your code here #####
-    ##########################
+    
+    res = 1/(1 + np.exp(-x))
 
     return res
 
@@ -46,11 +46,8 @@ def forward(X,params,name='',activation=sigmoid):
     W = params['W' + name]
     b = params['b' + name]
 
-
-    ##########################
-    ##### your code here #####
-    ##########################
-
+    pre_act = X@W + b
+    post_act = activation(pre_act)
 
     # store the pre-activation and post-activation values
     # these will be important in backprop
@@ -62,11 +59,17 @@ def forward(X,params,name='',activation=sigmoid):
 # x is [examples,classes]
 # softmax should be done for each row
 def softmax(x):
-    res = None
+    N, _ = x.shape
+    res = np.zeros(x.shape)
 
     ##########################
     ##### your code here #####
     ##########################
+    for i in range(N):
+        row = x[i]
+        c = - max(row)
+        row += c
+        res[i] = np.exp(row)/ sum(np.exp(row))
 
     return res
 
@@ -75,11 +78,20 @@ def softmax(x):
 # y is size [examples,classes]
 # probs is size [examples,classes]
 def compute_loss_and_acc(y, probs):
-    loss, acc = None, None
+    loss, acc = None, 0
 
     ##########################
     ##### your code here #####
     ##########################
+    count = 0
+    N = y.shape[0]
+    loss = np.sum(-y*np.log(probs), axis=1)
+    pred = np.argmax(probs, axis=1)
+    for i in range(N):
+        one_hot = y[i]
+        if one_hot[pred[i]]==1:
+            count += 1
+    acc = count/N
 
     return loss, acc 
 
